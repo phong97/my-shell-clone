@@ -1,0 +1,44 @@
+plugins {
+    id 'java'
+    id 'application'
+}
+
+group = 'org.my.shell'
+version = '1.0-SNAPSHOT'
+
+application {
+    mainClass = 'org.my.shell.Main'
+}
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    implementation('org.jline:jline:3.25.0')
+
+    testImplementation platform('org.junit:junit-bom:5.10.0')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+}
+
+jar {
+    manifest {
+        attributes(
+                'Built-By': System.properties['user.name'],
+                'Build-Timestamp': new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()),
+                'Created-By': "Gradle $gradle.gradleVersion",
+                'Build-Jdk': "${System.properties['java.version']} (${System.properties['java.vendor']} ${System.properties['java.vm.version']})",
+                'Build-OS': "${System.properties['os.name']} ${System.properties['os.arch']} ${System.properties['os.version']}",
+                'Class-Path': configurations.runtimeClasspath.collect { "lib/$it.name" }.join(' '),
+                'Main-Class': application.mainClass,
+        )
+    }
+
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}
+
+test {
+    useJUnitPlatform()
+}
